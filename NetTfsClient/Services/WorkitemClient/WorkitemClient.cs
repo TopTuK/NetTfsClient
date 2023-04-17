@@ -1,5 +1,6 @@
 ﻿using NetTfsClient.Helpers;
 using NetTfsClient.Models;
+using NetTfsClient.Models.Project;
 using NetTfsClient.Models.Workitems;
 using NetTfsClient.Services.HttpClient;
 using Newtonsoft.Json.Linq;
@@ -65,7 +66,7 @@ namespace NetTfsClient.Services.WorkitemClient
             var httpResponse = await httpClient.GetAsync(action, requestParams);
             if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
             {
-                throw new TfsClientException("IWorkitemClient::Exception: HTTP response is null or has error");
+                throw new ClientException("IWorkitemClient::Exception: HTTP response is null or has error");
             }
 
             return WorkitemFactory.FromJsonItems(this, httpResponse.Content);
@@ -78,7 +79,7 @@ namespace NetTfsClient.Services.WorkitemClient
             var idsCount = ids.Count();
             if (idsCount == 0)
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "Can't get workitems. Ids list is empty",
                     new ArgumentException(nameof(ids))
                 );
@@ -101,11 +102,62 @@ namespace NetTfsClient.Services.WorkitemClient
                 }
                 catch (Exception ex)
                 {
-                    throw new TfsClientException("IWorkitemClient: GetWorkitemsAsync exception", ex);
+                    throw new ClientException("IWorkitemClient: GetWorkitemsAsync exception", ex);
                 }
             }
 
             return resultItems;
+        }
+
+        public async Task<IEnumerable<IWorkitemChange>> GetWorkitemChangesAsync(int id,
+            int skip = 0, int top = -1)
+        {
+            var requestUrl = $"{clientConnection.ApiUrl}{WORKITEM_URL}/{id}/updates";
+
+            var queryParams = new Dictionary<string, string>()
+            {
+                { "api-version", API_VERSION },
+                { "$skip", $"{skip}" },
+            };
+
+            if (top > 0)
+            {
+                queryParams.Add("$top", $"{top}");
+            }
+
+            try
+            {
+                List<IWorkitemChange> changes = new();
+                bool hasNext = true;
+
+                do
+                {
+                    hasNext = false;
+
+                    var httpResponse = await httpClient.GetAsync(requestUrl, queryParams);
+                    if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
+                    {
+                        throw new ClientException("IWorkitemClient::GetWorkitemChangeAsync: http response is null or empty");
+                    }
+
+                    var items = WorkitemChangesFactory.WorkitemChangeFromJsonContent(httpResponse.Content);
+                    if (items.Any())
+                    {
+                        changes.AddRange(items);
+                        queryParams["$skip"] = changes
+                            .Count
+                            .ToString();
+                        hasNext = true;
+                    }
+                }
+                while (hasNext);
+
+                return changes;
+            }
+            catch (Exception ex)
+            {
+                throw new ClientException("IWorkitemClient::GetWorkitemChangeAsync: exception raised", ex);
+            }
         }
 
         private Dictionary<string, string> MakeQueryParams(string expand, bool bypassRules,
@@ -150,7 +202,7 @@ namespace NetTfsClient.Services.WorkitemClient
                         @from = (string?)null,
                         value = new
                         {
-                            rel = relation.RelationType,
+                            rel = relation.TypeName,
                             url = relation.Url,
                             attributes = (string?)null
                         }
@@ -173,14 +225,14 @@ namespace NetTfsClient.Services.WorkitemClient
 
                 if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                 {
-                    throw new TfsClientException("IWorkitemClient::CreateWorkitemAsync: http response is null or empty");
+                    throw new ClientException("IWorkitemClient::CreateWorkitemAsync: http response is null or empty");
                 }
 
                 return WorkitemFactory.FromJson(this, httpResponse.Content);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException("IWorkitemClient::CreateWorkitemAsync: exception raised", ex);
+                throw new ClientException("IWorkitemClient::CreateWorkitemAsync: exception raised", ex);
             }
         }
 
@@ -253,7 +305,7 @@ namespace NetTfsClient.Services.WorkitemClient
         {
             if (itemFields.Count == 0)
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "Updated item fields count is 0",
                     new ArgumentNullException(nameof(itemFields))
                 );
@@ -283,14 +335,14 @@ namespace NetTfsClient.Services.WorkitemClient
 
                 if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                 {
-                    throw new TfsClientException("IWorkitemClient::UpdateWorkitemFieldsAsync: HTTP response is null or empty");
+                    throw new ClientException("IWorkitemClient::UpdateWorkitemFieldsAsync: HTTP response is null or empty");
                 }
 
                 return WorkitemFactory.FromJson(this, httpResponse.Content);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "IWorkitemClient::UpdateWorkitemFieldsAsync: exception raised while updating workitem fields",
                     ex
                 );
@@ -306,7 +358,7 @@ namespace NetTfsClient.Services.WorkitemClient
         {
             if (relationType.Trim() == "")
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "Relationtype param is empty",
                     new ArgumentNullException(nameof(relationType))
                 );
@@ -342,14 +394,14 @@ namespace NetTfsClient.Services.WorkitemClient
 
                 if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                 {
-                    throw new TfsClientException("IWorkitemClient::AddRelationLinkAsync: HTTP response is null or empty");
+                    throw new ClientException("IWorkitemClient::AddRelationLinkAsync: HTTP response is null or empty");
                 }
 
                 return WorkitemFactory.FromJson(this, httpResponse.Content);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "IWorkitemClient::AddRelationLinkAsync: exception raised while adding relation link",
                     ex
                 );
@@ -384,14 +436,14 @@ namespace NetTfsClient.Services.WorkitemClient
 
                 if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                 {
-                    throw new TfsClientException("IWorkitemClient::RemoveRelationLinkAsync: HTTP response is null or empty");
+                    throw new ClientException("IWorkitemClient::RemoveRelationLinkAsync: HTTP response is null or empty");
                 }
 
                 return WorkitemFactory.FromJson(this, httpResponse.Content);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "TfsServiceClient: RemoveRelationLinkAsync exception",
                     ex);
             }
@@ -401,7 +453,7 @@ namespace NetTfsClient.Services.WorkitemClient
         {
             if (queryId.Trim() == "")
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "IWorkItemClient::RunSavedQueryAsync: query id can't be empty",
                     new ArgumentException(nameof(queryId))
                 );
@@ -420,20 +472,20 @@ namespace NetTfsClient.Services.WorkitemClient
 
                 if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                 {
-                    throw new TfsClientException("IWorkitemClient::RunSavedQueryAsync: HTTP response is null or empty");
+                    throw new ClientException("IWorkitemClient::RunSavedQueryAsync: HTTP response is null or empty");
                 }
 
                 var jsonObj = JObject.Parse(httpResponse.Content);
                 if ((jsonObj == null) || (jsonObj["wiql"] == null))
                 {
-                    throw new TfsClientException("IWorkitemClient::RunSavedQueryAsync: HTTP response does not have WIQL answer");
+                    throw new ClientException("IWorkitemClient::RunSavedQueryAsync: HTTP response does not have WIQL answer");
                 }
 
                 return await RunWiqlAsync(jsonObj["wiql"]!.ToObject<string>()!);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "IWorkitemClient: RunSavedQueryAsync exception raised",
                     ex);
             }
@@ -443,7 +495,7 @@ namespace NetTfsClient.Services.WorkitemClient
         {
             if (query.Trim() == "")
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "IWorkItemClient::RunWiqlAsync: query string can't be empty",
                     new ArgumentException(nameof(query))
                 );
@@ -473,14 +525,14 @@ namespace NetTfsClient.Services.WorkitemClient
 
                 if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                 {
-                    throw new TfsClientException("IWorkitemClient::RunWiqlAsync: HTTP response is null or empty");
+                    throw new ClientException("IWorkitemClient::RunWiqlAsync: HTTP response is null or empty");
                 }
 
                 return WiqlFactory.FromContentResponse(this, httpResponse.Content);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "IWorkitemClient: RunWiqlAsync exception raised",
                     ex);
             }
@@ -503,14 +555,14 @@ namespace NetTfsClient.Services.WorkitemClient
 
                 if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                 {
-                    throw new TfsClientException("IWorkitemClient::GetChangesetAsync: HTTP response is empty or null");
+                    throw new ClientException("IWorkitemClient::GetChangesetAsync: HTTP response is empty or null");
                 }
 
                 return ChangesetFactory.FromJsonResponse(this, httpResponse.Content);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "IWorkitemClient::GetChangesetAsync: exception raised", ex);
             }
         }

@@ -16,49 +16,6 @@ namespace NetTfsClient.Models.Workitems
             "System.Id",
         };
 
-        private class WorkitemRelation : IWorkitemRelation
-        {
-            private static readonly string WORKITEM_SUBSTR = "workItems/";
-            private static readonly int WORKITEM_SUBSTR_LENGTH = WORKITEM_SUBSTR.Length;
-
-            public string? Url { get; init; }
-
-            public string? TypeName { get; init; }
-            public WorkitemRelationType RelationType { get; init; }
-
-            public int WorkitemId { get; init; }
-
-            public WorkitemRelation(JToken jsonRelation)
-            {
-                Url = jsonRelation["url"]?.Value<string>();
-                TypeName = jsonRelation["rel"]?.Value<string>();
-
-                // 
-                if ((TypeName != null) && (RelationTypeNames
-                    .NameType.TryGetValue(TypeName, out var nameType)))
-                {
-                    RelationType = nameType;
-                }
-                else
-                {
-                    RelationType = WorkitemRelationType.Unknown;
-                }
-
-                int workitemId = -1;
-                if (Url != null)
-                {
-                    var idStartIdx = Url.IndexOf(WORKITEM_SUBSTR);
-                    if ((idStartIdx > 1) 
-                        && (int.TryParse(Url.Substring(idStartIdx + WORKITEM_SUBSTR_LENGTH), out var id)))
-                    {
-                        workitemId = id;
-                    }
-                }
-
-                WorkitemId = workitemId;
-            }
-        }
-
         private class Workitem : IWorkitem
         {
             public string ItemUrl { get; init; }
@@ -67,7 +24,24 @@ namespace NetTfsClient.Models.Workitems
 
             public string TypeName { get; init; }
 
-            public string? Title => GetStringField("System.Title");
+            public string? Title
+            {
+                get => GetStringField("System.Title");
+                set
+                {
+                    this["System.Title"] = value;
+                }
+            }
+
+            public string? Description
+            {
+                get => GetStringField("System.Description");
+                set
+                {
+                    this["System.Description"] = value;
+                }
+            }
+
             public string? State => GetStringField("System.State");
             public string? Reason => GetStringField("System.Reason");
 
@@ -184,7 +158,7 @@ namespace NetTfsClient.Models.Workitems
                 if ((jsonRelations != null) && (jsonRelations.HasValues))
                 {
                     Relations = jsonRelations
-                        .Select(jsonRelation => new WorkitemRelation(jsonRelation))
+                        .Select(jsonRelation =>WorkitemRelationFactory.WorkitemRelationFromJson(jsonRelation))
                         .ToList();
                 }
                 else
@@ -280,11 +254,16 @@ namespace NetTfsClient.Models.Workitems
                 }
                 catch (Exception ex)
                 {
-                    throw new TfsClientException(
+                    throw new ClientException(
                         "IWorkitem::SaveFieldsChangesAsync: exception raised",
                         ex
                     );
                 }
+            }
+
+            public async Task<IEnumerable<IWorkitemChange>> GetWorkitemChangesAsync()
+            {
+                return await Client.GetWorkitemChangesAsync(Id);
             }
         }
 
@@ -293,7 +272,7 @@ namespace NetTfsClient.Models.Workitems
             var jsonItems = JObject.Parse(jsonItemsStr);
             if (jsonItems["value"] == null)
             {
-                throw new TfsClientException("Can't parse json items");
+                throw new ClientException("Can't parse json items");
             }
 
             var items = jsonItems["value"]!.ToArray()
@@ -308,7 +287,7 @@ namespace NetTfsClient.Models.Workitems
             var jsonItem = JObject.Parse(jsonItemStr);
             if (jsonItem == null)
             {
-                throw new TfsClientException("Can't parse json item");
+                throw new ClientException("Can't parse json item");
             }
 
             return new Workitem(client, jsonItem);

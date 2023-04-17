@@ -36,6 +36,15 @@ namespace NetTfsClient.Services
             IEnumerable<string>? fields = null, string expand = "All", int batchSize = 50);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="skip"></param>
+        /// <param name="top"></param>
+        /// <returns></returns>
+        Task<IEnumerable<IWorkitemChange>> GetWorkitemChangesAsync(int id, int skip = 0, int top = -1);
+
+        /// <summary>
         /// Create new workitem
         /// </summary>
         /// <param name="itemType"></param>
@@ -122,6 +131,11 @@ namespace NetTfsClient.Services
         /// <returns></returns>
         Task<IWiqlResult> RunWiqlAsync(string query, int maxTop = -1);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="changesetId"></param>
+        /// <returns></returns>
         Task<IChangeset> GetChangesetAsync(int changesetId);
     }
 }

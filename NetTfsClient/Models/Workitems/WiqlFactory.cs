@@ -50,14 +50,14 @@ namespace NetTfsClient.Models.Workitems
                 var jsonObj = JObject.Parse(contentResponse);
                 if (jsonObj["workItems"] == null)
                 {
-                    throw new TfsClientException("WiqlFactory::FromContentResponse: json content response doesn't contain \"workitems\" attribute");
+                    throw new ClientException("WiqlFactory::FromContentResponse: json content response doesn't contain \"workitems\" attribute");
                 }
 
                 return new WiqlResult(workitemClient, jsonObj["workItems"]!);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException(
+                throw new ClientException(
                     "WiqlFactory::FromContentResponse: exception raised",
                     ex);
             }

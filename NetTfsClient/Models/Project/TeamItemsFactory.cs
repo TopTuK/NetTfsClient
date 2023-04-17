@@ -36,37 +36,53 @@ namespace NetTfsClient.Models.Project
             return Enumerable.Empty<ITeam>();
         }
 
-        private class TeamMember : ITeamMember
+        private class TeamMember : Member, ITeamMember
         {
             public ITeam Team { get; init; }
             public bool IsTeamAdmin { get; init; }
 
-            public string Id { get; init; }
-            public string DisplayName { get; init; }
-            public string Url { get; init; }
 
-            public TeamMember(ITeam team, JToken jMember)
+            public TeamMember(ITeam team, JToken jMember) 
+                : base(jMember)
             {
                 Team = team;
                 IsTeamAdmin = jMember["isTeamAdmin"]?.Value<bool>() ?? false;
+            }
+        }
 
+        private class Member : IMember
+        {
+            public string Id { get; init; }
+            public string DisplayName { get; init; }
+            public string UniqueName { get; init; }
+            public string Url { get; init; }
+
+            public Member(JToken jMember)
+            {
                 var jIdentity = jMember["identity"];
                 if (jIdentity != null)
                 {
                     Id = jIdentity["id"]?.Value<string>() ?? string.Empty;
                     DisplayName = jIdentity["displayName"]?.Value<string>() ?? string.Empty;
+                    UniqueName = jIdentity["uniqueName"]?.Value<string>() ?? string.Empty;
                     Url = jIdentity["url"]?.Value<string>() ?? string.Empty;
                 }
                 else
                 {
                     Id = string.Empty;
                     DisplayName = string.Empty;
+                    UniqueName = string.Empty;
                     Url = string.Empty;
                 }
             }
         }
 
-        public static IEnumerable<ITeamMember> MembersFromJsonItems(ITeam team, string jsonContent)
+        public static IMember MemberFromJsonItem(JToken jsonItem)
+        {
+            return new Member(jsonItem);
+        }
+
+        public static IEnumerable<ITeamMember> TeamMembersFromJsonItems(ITeam team, string jsonContent)
         {
             var jsonItems = JObject.Parse(jsonContent);
 

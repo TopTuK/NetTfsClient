@@ -41,7 +41,7 @@ namespace NetTfsClient.Services.MentionClient
             }
             catch (Exception ex)
             {
-                throw new TfsClientException("IMentionClient::SendMentionAsync: exception raised", ex);
+                throw new ClientException("IMentionClient::SendMentionAsync: exception raised", ex);
             }
         }
     }

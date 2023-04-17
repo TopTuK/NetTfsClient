@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace NetTfsClient.Helpers
 {
     /// <summary>
-    /// https://stackoverflow.com/questions/13731796/create-batches-in-linq/13731854
     /// "batch" function that would take as input an iterable and return an iterable of iterables
+    /// https://stackoverflow.com/questions/13731796/create-batches-in-linq/13731854
     /// </summary>
     internal static class BatchIterable
     {

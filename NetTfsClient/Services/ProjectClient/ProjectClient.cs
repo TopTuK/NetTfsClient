@@ -42,10 +42,10 @@ namespace NetTfsClient.Services.ProjectClient
 
                     if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                     {
-                        throw new TfsClientException("IProjectClient::GetProjectsAsync: HTTP response is empty or null");
+                        throw new ClientException("IProjectClient::GetProjectsAsync: HTTP response is empty or null");
                     }
 
-                    var items = ProjectItemsFactory.FromJsonItems(httpResponse.Content);
+                    var items = ProjectItemsFactory.FromJsonContent(httpResponse.Content);
                     if (items.Any())
                     {
                         projects.AddRange(items);
@@ -54,14 +54,14 @@ namespace NetTfsClient.Services.ProjectClient
                             .ToString();
                         hasNext = true;
                     }
-
-                    return projects;
                 }
                 while (hasNext);
+
+                return projects;
             }
             catch (Exception ex)
             {
-                throw new TfsClientException("IProjectClient::GetProjectsAsync: exception raised", ex);
+                throw new ClientException("IProjectClient::GetProjectsAsync: exception raised", ex);
             }
         }
 
@@ -71,7 +71,7 @@ namespace NetTfsClient.Services.ProjectClient
 
             var queryParams = new Dictionary<string, string>
             {
-                { "api-version", API_VERSION },
+                { "api-version", API_PREVIEW_VERSION },
                 { "$mine", $"{currentUser}" }
             };
 
@@ -81,14 +81,14 @@ namespace NetTfsClient.Services.ProjectClient
 
                 if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                 {
-                    throw new TfsClientException("IProjectClient::GetAllTeamsAsync: HTTP response is empty or null");
+                    throw new ClientException("IProjectClient::GetAllTeamsAsync: HTTP response is empty or null");
                 }
 
                 return TeamItemsFactory.TeamsFromJsonItems(httpResponse.Content);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException("IProjectClient::GetAllTeamsAsync: exception raised", ex);
+                throw new ClientException("IProjectClient::GetAllTeamsAsync: exception raised", ex);
             }
         }
 
@@ -109,14 +109,14 @@ namespace NetTfsClient.Services.ProjectClient
 
                 if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                 {
-                    throw new TfsClientException("IProjectClient::GetProjectTeamsAsync: HTTP response is empty or null");
+                    throw new ClientException("IProjectClient::GetProjectTeamsAsync: HTTP response is empty or null");
                 }
 
                 return TeamItemsFactory.TeamsFromJsonItems(httpResponse.Content);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException("IProjectClient::GetProjectTeamsAsync: exception raised", ex);
+                throw new ClientException("IProjectClient::GetProjectTeamsAsync: exception raised", ex);
             }
         }
 
@@ -138,14 +138,14 @@ namespace NetTfsClient.Services.ProjectClient
 
                 if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
                 {
-                    throw new TfsClientException("IProjectClient::GetProjectTeamMembersAsync: HTTP response is empty or null");
+                    throw new ClientException("IProjectClient::GetProjectTeamMembersAsync: HTTP response is empty or null");
                 }
 
-                return TeamItemsFactory.MembersFromJsonItems(team, httpResponse.Content);
+                return TeamItemsFactory.TeamMembersFromJsonItems(team, httpResponse.Content);
             }
             catch (Exception ex)
             {
-                throw new TfsClientException("IProjectClient::GetProjectTeamMembersAsync: exception raised", ex);
+                throw new ClientException("IProjectClient::GetProjectTeamMembersAsync: exception raised", ex);
             }
         }
     }

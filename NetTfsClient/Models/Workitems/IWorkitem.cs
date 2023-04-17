@@ -28,7 +28,9 @@ namespace NetTfsClient.Models.Workitems
         string ItemUrl { get; }
         string TypeName { get; }
 
-        string? Title { get; }
+        string? Title { get; set; }
+        string? Description { get; set; }
+
         string? State { get; }
         string? Reason { get; }
         string? AssignTo { get; }
@@ -45,6 +47,12 @@ namespace NetTfsClient.Models.Workitems
         Task<UpdateRelationsResult> AddRelationLinkAsync(int destinationWorkitemId, string relationTypeName,
             IReadOnlyDictionary<string, string>? relationAttributes = null);
         Task<UpdateRelationsResult> RemoveRelationLinksAsync(int destinationWorkitemId);
+
+        /// <summary>
+        /// Get history changes of workitem.
+        /// </summary>
+        /// <returns>workitem changes history: <see cref="IWorkitemChange"/></returns>
+        Task<IEnumerable<IWorkitemChange>> GetWorkitemChangesAsync();
 
         IWorkitemClient Client { get; }
     }

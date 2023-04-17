@@ -23,7 +23,7 @@ namespace NetTfsClient.Models.Project
             }
         }
 
-        public static IEnumerable<IProject> FromJsonItems(string jsonContent)
+        public static IEnumerable<IProject> FromJsonContent(string jsonContent)
         {
             var jsonItems = JObject.Parse(jsonContent);
             if (jsonItems["value"] != null)

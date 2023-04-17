@@ -6,25 +6,22 @@ using System.Threading.Tasks;
 
 namespace NetTfsClient.Models
 {
+    /// <summary>
+    /// ClientException contains information about raised exception
+    /// </summary>
     [Serializable]
-    public class TfsClientException : Exception
+    public class ClientException : Exception
     {
-        public TfsClientException()
+        public ClientException()
             : base()
-        {
+        { }
 
-        }
-
-        public TfsClientException(string message)
+        public ClientException(string message)
             : base(message)
-        {
+        { }
 
-        }
-
-        public TfsClientException(string message, Exception innerException)
+        public ClientException(string message, Exception innerException)
             : base(message, innerException)
-        {
-
-        }
+        { }
     }
 }

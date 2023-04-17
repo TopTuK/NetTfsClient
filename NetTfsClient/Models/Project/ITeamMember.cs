@@ -6,18 +6,8 @@ using System.Threading.Tasks;
 
 namespace NetTfsClient.Models.Project
 {
-    public interface ITeamMember
+    public interface IMember
     {
-        /// <summary>
-        /// Relevant Team
-        /// </summary>
-        ITeam Team { get; }
-
-        /// <summary>
-        /// Flag if member is team admin
-        /// </summary>
-        bool IsTeamAdmin { get; }
-
         /// <summary>
         /// Member ID.
         /// This ID is used for mentions
@@ -30,8 +20,26 @@ namespace NetTfsClient.Models.Project
         string DisplayName { get; }
 
         /// <summary>
+        /// Unique name (e.g. email) of TFS/Azure team member
+        /// </summary>
+        string UniqueName { get; }
+
+        /// <summary>
         /// This url is the full route to the source resource of this graph subject.
         /// </summary>
         string Url { get; }
+    }
+
+    public interface ITeamMember : IMember
+    {
+        /// <summary>
+        /// Relevant Team
+        /// </summary>
+        ITeam Team { get; }
+
+        /// <summary>
+        /// Flag if member is team admin
+        /// </summary>
+        bool IsTeamAdmin { get; }
     }
 }
