@@ -13,15 +13,25 @@ namespace TfsClient.Tests.WorkitemsTests
     {
         private readonly IWorkitemClient _workitemClient;
 
-        public WorkitemClientTests()
+        private static void SetEnvironmentVariablesFromUserSecrets()
         {
             var configuration = new ConfigurationBuilder()
                .AddUserSecrets<WorkitemClientTests>()
                .Build();
 
-            var serverUrl = configuration["ENV_SERVER_URL"];
-            var projectName = configuration["ENV_PROJECT_NAME"];
-            var pat = configuration["ENV_PAT"];
+            foreach (var child in configuration.GetChildren())
+            {
+                Environment.SetEnvironmentVariable(child.Key, child.Value);
+            }
+        }
+
+        public WorkitemClientTests()
+        {
+            SetEnvironmentVariablesFromUserSecrets();
+
+            string serverUrl = Environment.GetEnvironmentVariable("ENV_SERVER_URL")!;
+            string projectName = Environment.GetEnvironmentVariable("ENV_PROJECT_NAME")!;
+            string pat = Environment.GetEnvironmentVariable("ENV_PAT")!;
 
             var clientConnection = ClientFactory.CreateClientConnection(serverUrl, projectName, pat);
             _workitemClient = clientConnection.GetWorkitemClient();
