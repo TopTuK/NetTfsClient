@@ -14,7 +14,7 @@ namespace NetTfsClient.Services.MentionClient
         private static string TFS_HISTORY_FIELD = "System.History";
 
         public async Task<MentionResult> SendMentionAsync(IWorkitem workitem, 
-            ITeamMember toUser, string title, string message, ITeamMember? fromUser = null)
+            IMember toUser, string title, string message, IMember? fromUser = null)
         {
             StringBuilder mention = new StringBuilder();
 
