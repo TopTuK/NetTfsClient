@@ -59,13 +59,21 @@ namespace NetTfsClient.Models.Project
 
             public Member(JToken jMember)
             {
-                var jIdentity = jMember["identity"];
-                if (jIdentity != null)
+                if (jMember["identity"] != null)
                 {
+                    var jIdentity = jMember["identity"]!;
+
                     Id = jIdentity["id"]?.Value<string>() ?? string.Empty;
                     DisplayName = jIdentity["displayName"]?.Value<string>() ?? string.Empty;
                     UniqueName = jIdentity["uniqueName"]?.Value<string>() ?? string.Empty;
                     Url = jIdentity["url"]?.Value<string>() ?? string.Empty;
+                }
+                else if (jMember["id"] != null)
+                {
+                    Id = jMember["id"]?.Value<string>() ?? string.Empty;
+                    DisplayName = jMember["displayName"]?.Value<string>() ?? string.Empty;
+                    UniqueName = jMember["uniqueName"]?.Value<string>() ?? string.Empty;
+                    Url = jMember["url"]?.Value<string>() ?? string.Empty;
                 }
                 else
                 {

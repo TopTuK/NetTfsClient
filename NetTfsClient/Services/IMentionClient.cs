@@ -28,8 +28,7 @@ namespace NetTfsClient.Services
         /// <param name="message"></param>
         /// <param name="fromUser"></param>
         /// <returns></returns>
-        Task<MentionResult> SendMentionAsync(IWorkitem workitem, 
-            IMember toUser, string title, string message,
-            IMember? fromUser = null);
+        Task<MentionResult> SendMentionAsync(IWorkitem workitem, IMember toUser,
+            string message, IMember? fromUser = null);
     }
 }
