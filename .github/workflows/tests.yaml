@@ -28,4 +28,8 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
       - name: Test
+        env:
+          ENV_SERVER_URL: ${{secrets.ENV_SERVER_URL}}
+          ENV_PROJECT_NAME: ${{secrets.ENV_PROJECT_NAME}}
+          ENV_PAT: ${{secrets.ENV_PAT}}
         run: dotnet test --no-restore --verbosity normal
