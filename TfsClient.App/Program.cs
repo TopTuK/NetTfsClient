@@ -13,11 +13,11 @@ var configuration = new ConfigurationBuilder()
 
 // Get configuration
 var serverUrl = configuration["ENV_SERVER_URL"];
-var projetName = configuration["ENV_PROJECT_NAME"];
+var projectName = configuration["ENV_PROJECT_NAME"];
 var userPat = configuration["ENV_PAT"];
 
 // Create client connection with ClientFactory
-var connection = ClientFactory.CreateClientConnection(serverUrl, projetName, userPat);
+var connection = ClientFactory.CreateClientConnection(serverUrl, projectName, userPat);
 
 /* Get IProjectClient with extension method GetProjectClient() on connection */
 var projectClient = connection.GetProjectClient();
