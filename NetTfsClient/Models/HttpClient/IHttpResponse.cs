@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace NetTfsClient.Models.HttpClient
 {
+    /// <summary>
+    /// Http Response object with properties
+    /// </summary>
     public interface IHttpResponse
     {
         int StatusCode { get; }

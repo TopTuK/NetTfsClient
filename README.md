@@ -122,6 +122,19 @@ if (workitem != null)
     Console.WriteLine($"--- {workitem.Id} {workitem.Title} {workitem.TypeName} ---");
     Console.WriteLine($"WI propery (System.Title): {workitem["System.Title"]}");
     Console.WriteLine($"Description: {workitem.Description} Revision: {workitem.Rev}");
+
+    if (workitem.Relations.Any())
+    {
+        Console.WriteLine("Workitem relations:");
+        foreach (var rel in workitem.Relations)
+        {
+            Console.WriteLine($"Relation: workitem {rel.WorkitemId} -> {rel.TypeName} ({rel.RelationType})");
+        }
+    }
+    else
+    {
+        Console.WriteLine($"Workitem {workitem.Id} {workitem.Title} doen't have relation");
+    }
 }
 else
 {
@@ -171,6 +184,32 @@ if (workitem != null)
     {
         Console.WriteLine($"Can't get history changes of workitem {workitem.Id} {workitem.Title}");
     }
+}
+```
+
+```cs
+workitemId = 100;
+
+var wi = await workitemClient.GetSingleWorkitemAsync(workitemId);
+if (wi != null)
+{
+    // Set title and description
+    wi.Title = "New Title";
+    wi.Description = "Some description";
+
+    // Custom field (eg. System.History)
+    wi["System.History"] = "Hello there!";
+
+    // Save changes
+    var updateResult = await wi.SaveFieldsChangesAsync();
+    if (updateResult == UpdateFieldsResult.UPDATE_SUCCESS)
+    {
+        Console.WriteLine($"Update success: {wi.Id} {wi.Title} {wi.Description}");
+    }
+}
+else
+{
+    Console.WriteLine($"Can't get item with id={workitemId}");
 }
 ```
 
