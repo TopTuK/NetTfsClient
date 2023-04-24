@@ -9,6 +9,9 @@ using System.Xml.Linq;
 
 namespace NetTfsClient.Models.Workitems
 {
+    /// <summary>
+    /// Internal workitem factory
+    /// </summary>
     internal static class WorkitemFactory
     {
         private static readonly List<string> IGNORE_FIELDS = new()

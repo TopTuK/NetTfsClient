@@ -19,6 +19,9 @@ namespace NetTfsClient.Models.Workitems
         Related // System.LinkTypes.Related
     }
 
+    /// <summary>
+    /// Helper static class for relation type names
+    /// </summary>
     public static class RelationTypeNames
     {
         public static IReadOnlyDictionary<WorkitemRelationType, string> TypeName = new Dictionary<WorkitemRelationType, string>()
@@ -34,13 +37,28 @@ namespace NetTfsClient.Models.Workitems
             .ToDictionary(x => x.Value, x => x.Key);
     }
 
+    /// <summary>
+    /// Information about workitem relation
+    /// </summary>
     public interface IWorkitemRelation
     {
+        /// <summary>
+        /// Relation URL
+        /// </summary>
         string? Url { get; }
 
+        /// <summary>
+        /// Relation type name
+        /// </summary>
         string? TypeName { get; }
+        /// <summary>
+        /// Known type of relation type
+        /// </summary>
         WorkitemRelationType RelationType { get; }
 
+        /// <summary>
+        /// Destination workitem ID
+        /// </summary>
         int WorkitemId { get; }
     }
 }

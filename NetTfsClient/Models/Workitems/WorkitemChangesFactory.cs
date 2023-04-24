@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace NetTfsClient.Models.Workitems
 {
     /// <summary>
-    /// 
+    /// Internal Workitem changes factory
     /// </summary>
     internal static class WorkitemChangesFactory
     {

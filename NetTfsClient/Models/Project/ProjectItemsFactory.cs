@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace NetTfsClient.Models.Project
 {
+    /// <summary>
+    /// Internal project items factory
+    /// </summary>
     internal static class ProjectItemsFactory
     {
         private class Project : IProject
