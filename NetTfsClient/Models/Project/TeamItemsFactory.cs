@@ -26,6 +26,12 @@ namespace NetTfsClient.Models.Project
             }
         }
 
+        public static ITeam TeamFromJson(string jsonContent)
+        {
+            var jsonItem = JObject.Parse(jsonContent);
+            return new Team(jsonItem);
+        }
+
         public static IEnumerable<ITeam> TeamsFromJsonItems(string jsonContent)
         {
             var jsonItems = JObject.Parse(jsonContent);
@@ -68,14 +74,14 @@ namespace NetTfsClient.Models.Project
 
                     Id = jIdentity["id"]?.Value<string>() ?? string.Empty;
                     DisplayName = jIdentity["displayName"]?.Value<string>() ?? string.Empty;
-                    UniqueName = jIdentity["uniqueName"]?.Value<string>() ?? string.Empty;
+                    UniqueName = jIdentity["uniqueName"]?.Value<string>() ?? DisplayName;
                     Url = jIdentity["url"]?.Value<string>() ?? string.Empty;
                 }
                 else if (jMember["id"] != null)
                 {
                     Id = jMember["id"]?.Value<string>() ?? string.Empty;
                     DisplayName = jMember["displayName"]?.Value<string>() ?? string.Empty;
-                    UniqueName = jMember["uniqueName"]?.Value<string>() ?? string.Empty;
+                    UniqueName = jMember["uniqueName"]?.Value<string>() ?? DisplayName;
                     Url = jMember["url"]?.Value<string>() ?? string.Empty;
                 }
                 else

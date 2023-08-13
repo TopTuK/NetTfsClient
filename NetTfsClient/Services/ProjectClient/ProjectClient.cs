@@ -19,6 +19,35 @@ namespace NetTfsClient.Services.ProjectClient
         {
         }
 
+        public async Task<IProject> GetProjectAsync(string projectId, bool capabilities = false, bool history = false)
+        {
+            // request_url = f'{self.client_connection.api_url}{self._URL_PROJECTS}/{project_id}'
+            var requestUrl = $"{clientConnection.ApiUrl}{PROJECTS_URL}/{projectId}";
+
+            var queryParams = new Dictionary<string, string>
+            {
+                { "api-version", API_VERSION },
+                { "includeCapabilities", capabilities.ToString() },
+                { "includeHistory", history.ToString() },
+            };
+
+            try
+            {
+                var httpResponse = await httpClient.GetAsync(requestUrl, queryParams);
+
+                if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
+                {
+                    throw new ClientException("IProjectClient::GetProjectAsync: HTTP response is empty or null");
+                }
+
+                return ProjectItemsFactory.ProjectFromJson(httpResponse.Content);
+            }
+            catch (Exception ex)
+            {
+                throw new ClientException("IProjectClient::GetProjectAsync: exception raised", ex);
+            }
+        }
+
         public async Task<IEnumerable<IProject>> GetProjectsAsync(int skip = 0)
         {
             var requestUrl = $"{clientConnection.ApiUrl}{PROJECTS_URL}";
@@ -45,7 +74,7 @@ namespace NetTfsClient.Services.ProjectClient
                         throw new ClientException("IProjectClient::GetProjectsAsync: HTTP response is empty or null");
                     }
 
-                    var items = ProjectItemsFactory.FromJsonContent(httpResponse.Content);
+                    var items = ProjectItemsFactory.ProjectsFromJsonContent(httpResponse.Content);
                     if (items.Any())
                     {
                         projects.AddRange(items);
@@ -62,6 +91,33 @@ namespace NetTfsClient.Services.ProjectClient
             catch (Exception ex)
             {
                 throw new ClientException("IProjectClient::GetProjectsAsync: exception raised", ex);
+            }
+        }
+
+        public async Task<ITeam> GetTeamAsync(string projectId, string teamId, bool expand = false)
+        {
+            // request_url = f'{self.client_connection.api_url}{self._URL_PROJECTS}/{project_id}/{self._URL_TEAMS}/{team_id}'
+            var requestUrl = $"{clientConnection.ApiUrl}{PROJECTS_URL}/{projectId}/{TEAMS_URL}/{teamId}";
+            var queryParams = new Dictionary<string, string>
+            {
+                { "api-version", API_VERSION },
+                { "$expandIdentity", $"{expand}" }
+            };
+
+            try
+            {
+                var httpResponse = await httpClient.GetAsync(requestUrl, queryParams);
+
+                if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
+                {
+                    throw new ClientException("IProjectClient::GetTeamAsync: HTTP response is empty or null");
+                }
+
+                return TeamItemsFactory.TeamFromJson(httpResponse.Content);
+            }
+            catch (Exception ex)
+            {
+                throw new ClientException("IProjectClient::GetTeamAsync: exception raised", ex);
             }
         }
 
@@ -146,6 +202,68 @@ namespace NetTfsClient.Services.ProjectClient
             catch (Exception ex)
             {
                 throw new ClientException("IProjectClient::GetProjectTeamMembersAsync: exception raised", ex);
+            }
+        }
+
+        // {project_id}/_api/_identity/ReadScopedApplicationGroupsJson?__v=5
+        public async Task<IEnumerable<IIdentity>> GetProjectGroupsAsync(IProject project)
+        {
+            var requestUrl = $"{clientConnection.CollectionName}/"
+                + $"{project.Id}/_api/_identity/ReadScopedApplicationGroupsJson";
+
+            var queryParams = new Dictionary<string, string>
+            {
+                { "__v", "5" },
+            };
+
+            try
+            {
+                var httpResponse = await httpClient.GetAsync(requestUrl, queryParams);
+                if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
+                {
+                    throw new ClientException("IProjectClient::GetProjectGroups: HTTP response is empty or null");
+                }
+
+                return ProjectItemsFactory.IdentitiesFromJsonContent(httpResponse.Content);
+            }
+            catch (Exception ex)
+            {
+                throw new ClientException("IProjectClient::GetProjectGroups: exception raised", ex);
+            }
+        }
+
+        // {project_id}/_api/_identity/ReadGroupMembers?__v=5&scope={group.foundation_id}&readMembers=true
+        public async Task<IEnumerable<IIdentity>> GetProjectGroupMembersAsync(IProject project, IIdentity identity)
+        {
+            if (!identity.IsGroup)
+            {
+                throw new ArgumentException("IProjectClient::GetProjectGroupMembersAsync: identity should be groupd", nameof(identity));
+            }
+
+            // request_url = f'{self.client_connection.collection}/{project.id}/_api/_identity/ReadGroupMembers'
+            var requestUrl = $"{clientConnection.CollectionName}/"
+                + $"{project.Id}/_api/_identity/ReadGroupMembers";
+
+            var queryParams = new Dictionary<string, string>
+            {
+                { "__v", "5" },
+                { "scope", identity.FoundationId },
+                { "readMembers", "true" },
+            };
+
+            try
+            {
+                var httpResponse = await httpClient.GetAsync(requestUrl, queryParams);
+                if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
+                {
+                    throw new ClientException("IProjectClient::GetProjectGroupMembersAsync: HTTP response is empty or null");
+                }
+
+                return ProjectItemsFactory.IdentitiesFromJsonContent(httpResponse.Content);
+            }
+            catch (Exception ex)
+            {
+                throw new ClientException("IProjectClient::GetProjectGroupMembersAsync: exception raised", ex);
             }
         }
     }
