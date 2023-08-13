@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace NetTfsClient.Models.Project
 {
+    /// <summary>
+    /// Information about member of Azure/TFS service
+    /// </summary>
     public interface IMember
     {
         /// <summary>
@@ -30,6 +33,9 @@ namespace NetTfsClient.Models.Project
         string Url { get; }
     }
 
+    /// <summary>
+    /// Information about member of Team of Azure/TFS service
+    /// </summary>
     public interface ITeamMember : IMember
     {
         /// <summary>

@@ -9,15 +9,18 @@ using System.Threading.Tasks;
 namespace NetTfsClient.Services
 {
     /// <summary>
-    /// Internal abstract base client class. Contains information about API versions and connection to TFS/Azure service.
+    /// Internal abstract base client class.
+    /// Contains information about API versions and connection to TFS/Azure service.
     /// </summary>
     internal abstract class BaseClient
     {
         /// <summary>
-        /// API Version of requests to TFS/Azure service.
+        /// API Version for requests to TFS/Azure service.
         /// </summary>
         protected const string API_VERSION = "6.0";
-
+        /// <summary>
+        /// Preview API Version for requests to TFS/Azure service.
+        /// </summary>
         protected const string API_PREVIEW_VERSION = "6.0-preview.3";
 
         /// <summary>

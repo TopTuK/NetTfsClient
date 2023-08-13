@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace NetTfsClient.Models.Project
 {
+    /// <summary>
+    /// Contains information about team of Azure/TFS service
+    /// </summary>
     public interface ITeam
     {
         /// <summary>

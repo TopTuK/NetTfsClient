@@ -28,10 +28,13 @@ namespace NetTfsClient.Models.Workitems
         string? OldValue { get; }
     }
 
+    /// <summary>
+    /// Information about relation changes
+    /// </summary>
     public interface IRelationChanges
     {
         /// <summary>
-        /// 
+        /// Flag indicating change has relation changes
         /// </summary>
         bool HasChanges { get; }
 

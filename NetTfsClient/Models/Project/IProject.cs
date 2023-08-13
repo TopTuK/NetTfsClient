@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace NetTfsClient.Models.Project
 {
+    /// <summary>
+    /// Project model class contains information about ID, name and description of TFS/Azure Project.
+    /// </summary>
     public interface IProject
     {
         /// <summary>
@@ -19,8 +22,7 @@ namespace NetTfsClient.Models.Project
         string Name { get; }
 
         /// <summary>
-        /// Description of TFS/Azure Project
-        /// Can be Empty string
+        /// Description of TFS/Azure Project. Can be Empty string
         /// </summary>
         string Description { get; }
     }
