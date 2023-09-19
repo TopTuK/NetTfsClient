@@ -4,12 +4,36 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.1.0</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Net Tfs Client</Title>
+    <Authors>TopTuK</Authors>
+    <PackageProjectUrl>https://github.com/TopTuK/NetTfsClient</PackageProjectUrl>
+    <Description>Microsoft Team Foundation Server .Net Library is a client for Azure service. It can manage workitems, projects and team members.</Description>
+    <PackageIcon>nettfsicon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>https://github.com/TopTuK/NetTfsClient</RepositoryType>
+    <PackageTags>Azure;TFS;Azure client;TFS Client;</PackageTags>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RestSharp" Version="110.2.0" />
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\nettfsicon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="RestSharp" Version="108.0.3" />
   </ItemGroup>
 
 </Project>

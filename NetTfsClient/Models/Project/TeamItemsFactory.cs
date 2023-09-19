@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace NetTfsClient.Models.Project
 {
+    /// <summary>
+    /// Internal teams items factory
+    /// </summary>
     internal static class TeamItemsFactory
     {
         private class Team : ITeam
@@ -21,6 +24,12 @@ namespace NetTfsClient.Models.Project
                 Name = jTeam["name"]?.Value<string>() ?? string.Empty;
                 Description = jTeam["description"]?.Value<string>() ?? string.Empty;
             }
+        }
+
+        public static ITeam TeamFromJson(string jsonContent)
+        {
+            var jsonItem = JObject.Parse(jsonContent);
+            return new Team(jsonItem);
         }
 
         public static IEnumerable<ITeam> TeamsFromJsonItems(string jsonContent)
@@ -59,13 +68,21 @@ namespace NetTfsClient.Models.Project
 
             public Member(JToken jMember)
             {
-                var jIdentity = jMember["identity"];
-                if (jIdentity != null)
+                if (jMember["identity"] != null)
                 {
+                    var jIdentity = jMember["identity"]!;
+
                     Id = jIdentity["id"]?.Value<string>() ?? string.Empty;
                     DisplayName = jIdentity["displayName"]?.Value<string>() ?? string.Empty;
-                    UniqueName = jIdentity["uniqueName"]?.Value<string>() ?? string.Empty;
+                    UniqueName = jIdentity["uniqueName"]?.Value<string>() ?? DisplayName;
                     Url = jIdentity["url"]?.Value<string>() ?? string.Empty;
+                }
+                else if (jMember["id"] != null)
+                {
+                    Id = jMember["id"]?.Value<string>() ?? string.Empty;
+                    DisplayName = jMember["displayName"]?.Value<string>() ?? string.Empty;
+                    UniqueName = jMember["uniqueName"]?.Value<string>() ?? DisplayName;
+                    Url = jMember["url"]?.Value<string>() ?? string.Empty;
                 }
                 else
                 {

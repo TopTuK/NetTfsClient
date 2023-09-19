@@ -40,7 +40,6 @@ namespace NetTfsClient.Services.HttpClient
         /// <summary>
         /// Basic IHttpResponse realization
         /// </summary>
-        /// 
         private class RestHttpResponse : IHttpResponse
         {
             private RestResponse _restResponse;
@@ -77,7 +76,6 @@ namespace NetTfsClient.Services.HttpClient
         public HttpClient(string baseUrl)
         {
             _client = new RestClient(baseUrl);
-            //_client.CookieContainer = new System.Net.CookieContainer();
         }
 
         public HttpClient(string baseUrl, string personalAccessToken) 

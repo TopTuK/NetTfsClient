@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace NetTfsClient.Models.Workitems
 {
+    /// <summary>
+    /// Internal WIQL result factory
+    /// </summary>
     internal static class WiqlFactory
     {
         private class WiqlResult : IWiqlResult

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace NetTfsClient.Models.Workitems
 {
+    /// <summary>
+    /// public workitem relation factory
+    /// </summary>
     public static class WorkitemRelationFactory
     {
         private class WorkitemRelation : IWorkitemRelation
@@ -68,7 +71,7 @@ namespace NetTfsClient.Models.Workitems
             }
         }
 
-        public static IWorkitemRelation WorkitemRelationFromJson(JToken jsonItem)
+        internal static IWorkitemRelation WorkitemRelationFromJson(JToken jsonItem)
         {
             return new WorkitemRelation(jsonItem);
         }

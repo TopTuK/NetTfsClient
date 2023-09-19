@@ -7,7 +7,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTfsClient", "NetTfsClien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TfsClient.App", "TfsClient.App\TfsClient.App.csproj", "{8BEFAF30-5615-4EDA-8D7A-A809B8EE302B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TfsClient.Tests", "TfsClient.Tests\TfsClient.Tests.csproj", "{C6E0C29A-6A23-4620-8E94-7709ADB9F528}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TfsClient.Tests", "TfsClient.Tests\TfsClient.Tests.csproj", "{C6E0C29A-6A23-4620-8E94-7709ADB9F528}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1403E0E6-8CCF-4615-A3EE-DE84CAA3D527}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		.github\CODEOWNERS = .github\CODEOWNERS
+		LICENSE.txt = LICENSE.txt
+		nettfsicon.png = nettfsicon.png
+		README.md = README.md
+		.github\workflows\tests.yaml = .github\workflows\tests.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

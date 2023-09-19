@@ -61,7 +61,7 @@ namespace TfsClient.Tests.ProjectTests
 
             // Assert
             Assert.NotNull(projects);
-            Assert.True(projects.Any());
+            Assert.True(projects!.Any());
 
             Assert.NotNull(teams);
             Assert.True(teams.Any());
@@ -69,7 +69,7 @@ namespace TfsClient.Tests.ProjectTests
             Assert.NotNull(prjTeams);
 
             Assert.NotNull(members);
-            Assert.True(members.Any());
+            Assert.True(members!.Any());
         }
     }
 }
