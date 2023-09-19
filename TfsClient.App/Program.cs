@@ -12,9 +12,9 @@ var configuration = new ConfigurationBuilder()
     .Build();
 
 // Get configuration
-var serverUrl = configuration["ENV_SERVER_URL"];
-var projectName = configuration["ENV_PROJECT_NAME"];
-var userPat = configuration["ENV_PAT"];
+var serverUrl = configuration["ENV_SERVER_URL"]!;
+var projectName = configuration["ENV_PROJECT_NAME"]!;
+var userPat = configuration["ENV_PAT"]!;
 
 // Create client connection with ClientFactory
 var connection = ClientFactory.CreateClientConnection(serverUrl, projectName, userPat);
