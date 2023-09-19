@@ -9,7 +9,7 @@ namespace NetTfsClient.Services.HttpClient
 {
     public interface IHttpClient
     {
-        Uri? BaseUrl { get; set; }
+        Uri? BaseUrl { get; }
 
         Task<IHttpResponse?> GetAsync(string actionUrl,
             IReadOnlyDictionary<string, string>? queryParams = null,

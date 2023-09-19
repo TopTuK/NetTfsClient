@@ -3,8 +3,11 @@ using NetTfsClient.Services;
 
 Console.WriteLine("Hello to TFS Client test app!");
 
-var serverUrl = "";
-var projetName = "";
-var userPat = "";
+var userName = @"";
+var userPassword = @""; 
 
-var connection = ClientFactory.CreateClientConnection(serverUrl, projetName, userPat);
+var serverUrl = @"";
+var projetName = @"";
+
+var clientConnection = ClientFactory.CreateClientConnection(userName, userPassword, serverUrl, projetName);
+var workitemClient = clientConnection.GetWorkitemClient();
