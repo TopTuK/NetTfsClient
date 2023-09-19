@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,10 +30,9 @@ namespace NetTfsClient.Services.HttpClient
                     );
             }
 
-            public ValueTask Authenticate(RestClient client, RestRequest request)
+            public ValueTask Authenticate(IRestClient client, RestRequest request)
             {
                 request.AddHeader("Authorization", _personalAccessToken);
-
                 return ValueTask.CompletedTask;
             }
         }
@@ -69,7 +69,6 @@ namespace NetTfsClient.Services.HttpClient
         public Uri? BaseUrl 
         { 
             get => _client.Options.BaseUrl;
-            set => _client.Options.BaseUrl = value;
         }
 
         private readonly RestClient _client;
@@ -80,20 +79,35 @@ namespace NetTfsClient.Services.HttpClient
         }
 
         public HttpClient(string baseUrl, string personalAccessToken) 
-            : this(baseUrl)
         {
-            _client.Authenticator = new TfsPatAuthenticator(personalAccessToken);
+            var options = new RestClientOptions(baseUrl)
+            {
+                Authenticator = new TfsPatAuthenticator(personalAccessToken)
+            };
+
+            _client = new RestClient(options);
         }
 
         public HttpClient(string baseUrl, string userName, string userPassword)
-            : this(baseUrl)
         {
             // https://restsharp.dev/v107/#ntlm-authentication
-            _client.Authenticator = new HttpBasicAuthenticator(userName, userPassword);
+            //var url = new Uri(baseUrl);
 
-            var url = new Uri(baseUrl);
-            _client.Options.UseDefaultCredentials = false;
-            _client.Options.Credentials = new NetworkCredential(userName, userPassword, url.Host);
+            var options = new RestClientOptions(baseUrl)
+            {
+                // Authenticator = new HttpBasicAuthenticator(userName, userPassword),
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(userName, userPassword)//, url.Host)
+            };
+
+            _client = new RestClient(options);
+        }
+
+        public HttpClient(string baseUrl, ClaimsPrincipal claimsPrincipal)
+            : this(baseUrl)
+        {
+            //_client.Options.Credentials = new NetworkCredential(
+            //    claimsPrincipal.Identity!.Name, (string?) null, claimsPrincipal.Identity.AuthenticationType);
         }
 
         private RestRequest MakeRequest(string action,

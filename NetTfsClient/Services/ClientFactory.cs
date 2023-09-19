@@ -3,6 +3,7 @@ using NetTfsClient.Services.HttpClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,11 @@ namespace NetTfsClient.Services
     /// </summary>
     public static class ClientFactory
     {
+        // ServerUrl should ends with '/'
+        private static string TranslateServerUrl(string serverUrl) => serverUrl.EndsWith("/")
+            ? serverUrl
+            : $"{serverUrl}/";
+
         private class ClientConnection : IClientConnection
         {
             public string ServerUrl { get; init; }
@@ -34,11 +40,13 @@ namespace NetTfsClient.Services
             {
                 HttpClient = httpClient;
 
+                ServerUrl = serverUrl;
                 // ServerUrl should ends with '/'
-                ServerUrl = serverUrl.EndsWith("/")
+                /*ServerUrl = serverUrl.EndsWith("/")
                     ? serverUrl
-                    : $"{serverUrl}/";
-                HttpClient.BaseUrl = new Uri(ServerUrl);
+                    : $"{serverUrl}/";*/
+                // Changing base url is deprecated
+                //HttpClient.BaseUrl = new Uri(ServerUrl);
 
                 // Closure function to get Collection and Project
                 (string, string) GetCollectionAndProject()
@@ -73,7 +81,9 @@ namespace NetTfsClient.Services
         public static IClientConnection CreateClientConnection(string userName, string userPassword,
             string serverUrl, string projectName = "DefaultCollection")
         {
+            serverUrl = TranslateServerUrl(serverUrl);
             var httpClient = HttpClientFactory.CreateHttpClient(serverUrl, userName, userPassword);
+
             return new ClientConnection(httpClient, serverUrl, projectName);
         }
 
@@ -88,7 +98,25 @@ namespace NetTfsClient.Services
         public static IClientConnection CreateClientConnection(string serverUrl, string projectName,
             string personalAccessToken)
         {
+            serverUrl = TranslateServerUrl(serverUrl);
             var httpClient = HttpClientFactory.CreateHttpClient(serverUrl, personalAccessToken);
+
+            return new ClientConnection(httpClient, serverUrl, projectName);
+        }
+
+        /// <summary>
+        /// Creates IClientConnection instance with authorization with given claims principal
+        /// </summary>
+        /// <param name="serverUrl">URL of TFS/Azure service</param>
+        /// <param name="projectName">Project name with collection. Default is 'DefaultCollection' without project</param>
+        /// <param name="claimsPrincipal">Claims principal</param>
+        /// <returns>Instance of IClientConnection with authorization with claims principal</returns>
+        public static IClientConnection CreateClientConnection(string serverUrl, string projectName,
+            ClaimsPrincipal claimsPrincipal)
+        {
+            serverUrl = TranslateServerUrl(serverUrl);
+            var httpClient = HttpClientFactory.CreateHttpClient(serverUrl, claimsPrincipal);
+
             return new ClientConnection(httpClient, serverUrl, projectName);
         }
 
