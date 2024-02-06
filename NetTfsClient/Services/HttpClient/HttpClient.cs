@@ -73,9 +73,13 @@ namespace NetTfsClient.Services.HttpClient
 
         private readonly RestClient _client;
 
-        public HttpClient(string baseUrl)
+        public HttpClient(string baseUrl, bool useDefaultCredentials = false)
         {
-            _client = new RestClient(baseUrl);
+            var options = new RestClientOptions(baseUrl)
+            {
+                UseDefaultCredentials = useDefaultCredentials
+            };
+            _client = new RestClient(options);
         }
 
         public HttpClient(string baseUrl, string personalAccessToken) 

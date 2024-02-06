@@ -9,7 +9,7 @@ namespace NetTfsClient.Services.HttpClient
 {
     public static class HttpClientFactory
     {
-        public static IHttpClient CreateHttpClient(string baseUrl)
+        public static IHttpClient CreateHttpClient(string baseUrl, bool useDefaultCredentials = false)
         {
             return new HttpClient(baseUrl);
         }
