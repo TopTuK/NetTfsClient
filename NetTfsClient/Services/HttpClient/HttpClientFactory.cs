@@ -11,7 +11,7 @@ namespace NetTfsClient.Services.HttpClient
     {
         public static IHttpClient CreateHttpClient(string baseUrl, bool useDefaultCredentials = false)
         {
-            return new HttpClient(baseUrl);
+            return new HttpClient(baseUrl, useDefaultCredentials);
         }
 
         public static IHttpClient CreateHttpClient(string baseUrl, string userName, string userPassword)
