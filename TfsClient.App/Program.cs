@@ -6,7 +6,6 @@ using NetTfsClient.Services;
 
 Console.WriteLine("Hello to TFS Client test app!");
 
-
 var configuration = new ConfigurationBuilder()
     .AddUserSecrets<Program>()
     .Build();

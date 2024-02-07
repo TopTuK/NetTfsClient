@@ -160,7 +160,7 @@ namespace NetTfsClient.Services.WorkitemClient
             }
         }
 
-        private Dictionary<string, string> MakeQueryParams(string expand, bool bypassRules,
+        private static Dictionary<string, string> MakeQueryParams(string expand, bool bypassRules,
             bool suppressNotifications, bool validateOnly) => new()
             {
                 { "api-version", API_VERSION },
