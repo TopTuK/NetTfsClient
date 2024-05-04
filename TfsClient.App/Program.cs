@@ -198,3 +198,41 @@ else
 }
 
 Console.WriteLine("### END SECTION WORKITEMS ###");
+
+Console.WriteLine("### START SECTION BOARDS ###");
+
+var boardClient = connection.GetBoardClient();
+var projectId = configuration["ENV_PROJECT_ID"]!;
+var teamId = configuration["ENV_TEAM_ID"]!;
+
+var boards = await boardClient.GetBoardsAsync(projectId, teamId);
+foreach (var boardItem in boards)
+{
+    Console.WriteLine($"Board: {boardItem.Id} {boardItem.Name}");
+}
+Console.WriteLine();
+
+var boardId = boards.First()!.Id;
+var board = await boardClient.GetBoardAsync(projectId, teamId, boardId);
+if (board != null)
+{
+    Console.WriteLine($"Board: {board.Id} {board.Name} Rev: {board.Rev}, IsValid: {board.IsValid}, CanEdit: {board.CanEdit}");
+    Console.WriteLine($"Board has {board.Columns.Count()} columns and {board.Rows.Count()} rows");
+
+    Console.WriteLine("Board columns:");
+    foreach (var col in board.Columns)
+    {
+        Console.WriteLine($"\tColumn: {col.Id} {col.Name} Type: {col.ColumnRole} ({col.ColumnType}) WipLimit: {col.WipLimit}");
+        Console.WriteLine($"\tColumn state mapping ({col.StateMap.Count()}): {col.StateMap.First().WorkitemType} -> {col.StateMap.First().WorkitemState}");
+    }
+    Console.WriteLine();
+
+    Console.WriteLine("Board rows:");
+    foreach (var row in board.Rows)
+    {
+        Console.WriteLine($"\tRow: {row.Id} {row.Name} Color: {row.Color}");
+    }
+    Console.WriteLine();
+}
+
+Console.WriteLine("### END SECTION BOARDS ###");
