@@ -1,4 +1,5 @@
 ﻿using NetTfsClient.Models;
+using NetTfsClient.Models.Boards;
 using NetTfsClient.Models.Project;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace NetTfsClient.Services.ProjectClient
         private const string PROJECTS_URL = @"projects";
         private const string TEAMS_URL = @"teams";
         private const string PROJECT_TEAM_MEMBERS = @"members";
+        private const string BOARDS_URL = @"boards";
 
         public ProjectClient(IClientConnection clientConnection)
             : base(clientConnection)
@@ -264,6 +266,77 @@ namespace NetTfsClient.Services.ProjectClient
             catch (Exception ex)
             {
                 throw new ClientException("IProjectClient::GetProjectGroupMembersAsync: exception raised", ex);
+            }
+        }
+
+        public async Task<IBoard?> GetProjectTeamBoardAsync(IProject project, ITeam team, string boardId)
+        {
+            if (boardId == string.Empty)
+            {
+                throw new ArgumentException("Board Id can\'t be empty string", nameof(boardId));
+            }
+
+            var requestUrl = $"{clientConnection.CollectionName}/{project.Id}/{team.Id}/_apis/work/{BOARDS_URL}/{boardId}";
+
+            var queryParams = new Dictionary<string, string>
+            {
+                { "api-version", API_VERSION },
+            };
+
+            try
+            {
+                var httpResponse = await httpClient.GetAsync(requestUrl, queryParams);
+
+                if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
+                {
+                    throw new ClientException("IBoardClient::GetBoardAsync: HTTP response is empty or null");
+                }
+
+                return BoardItemsFactory.BoardFromJsonContent(httpResponse.Content);
+            }
+            catch (Exception ex)
+            {
+                throw new ClientException("IBoardClient::GetBoardAsync: exception raised", ex);
+            }
+        }
+
+        public async Task<IEnumerable<IBoard>> GetProjectTeamBoardsAsync(IProject project, ITeam team)
+        {
+            var requestUrl = $"{clientConnection.CollectionName}/{project.Id}/{team.Id}/_apis/work/{BOARDS_URL}";
+
+            var queryParams = new Dictionary<string, string>
+            {
+                { "api-version", API_VERSION },
+            };
+
+            try
+            {
+                var httpResponse = await httpClient.GetAsync(requestUrl, queryParams);
+
+                if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
+                {
+                    throw new ClientException("IProjectClient::GetProjectTeamBoardsAsync: HTTP response is empty or null");
+                }
+
+                var boardsInfo = BoardItemsFactory.BaseBoardsFromJsonContent(httpResponse.Content);
+                
+                var boards = new List<IBoard>(boardsInfo.Count());
+                foreach (var boardInfo in boardsInfo)
+                {
+                    var board = await GetProjectTeamBoardAsync(project, team, boardInfo.Id);
+                    if (board == null)
+                    {
+                        throw new ClientException($"IProjectClient::GetProjectTeamBoardsAsync: can\'t get board with Id={boardInfo.Id}");
+                    }
+
+                    boards.Add(board);
+                }
+
+                return boards;
+            }
+            catch (Exception ex)
+            {
+                throw new ClientException("IProjectClient::GetProjectTeamBoardsAsync: exception raised", ex);
             }
         }
     }

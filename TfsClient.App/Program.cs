@@ -201,11 +201,13 @@ Console.WriteLine("### END SECTION WORKITEMS ###");
 
 Console.WriteLine("### START SECTION BOARDS ###");
 
-var boardClient = connection.GetBoardClient();
 var projectId = configuration["ENV_PROJECT_ID"]!;
 var teamId = configuration["ENV_TEAM_ID"]!;
 
-var boards = await boardClient.GetBoardsAsync(projectId, teamId);
+var prj = await projectClient.GetProjectAsync(projectId);
+var tm = await projectClient.GetTeamAsync(projectId, teamId);
+
+var boards = await projectClient.GetProjectTeamBoardsAsync(prj, tm);
 foreach (var boardItem in boards)
 {
     Console.WriteLine($"Board: {boardItem.Id} {boardItem.Name}");
@@ -213,7 +215,7 @@ foreach (var boardItem in boards)
 Console.WriteLine();
 
 var boardId = boards.First()!.Id;
-var board = await boardClient.GetBoardAsync(projectId, teamId, boardId);
+var board = await projectClient.GetProjectTeamBoardAsync(prj, tm, boardId);
 if (board != null)
 {
     Console.WriteLine($"Board: {board.Id} {board.Name} Rev: {board.Rev}, IsValid: {board.IsValid}, CanEdit: {board.CanEdit}");

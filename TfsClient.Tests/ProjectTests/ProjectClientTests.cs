@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using NetTfsClient.Models.Boards;
 using NetTfsClient.Models.Project;
 using NetTfsClient.Services;
 using System;
@@ -70,6 +71,58 @@ namespace TfsClient.Tests.ProjectTests
 
             Assert.NotNull(members);
             Assert.True(members!.Any());
+        }
+
+        private async Task<IProject?> GetProject()
+        {
+            var projects = await _prjClient.GetProjectsAsync();
+            return projects.FirstOrDefault();
+        }
+
+        private async Task<ITeam?> GetProjectTeam(IProject project)
+        {
+            var teams = await _prjClient.GetProjectTeamsAsync(project);
+            return teams.FirstOrDefault();
+        }
+
+
+        [Fact(DisplayName = "Boards test for ProjectClient")]
+        public async Task MakeBoardClientTests()
+        {
+            // Arrange
+            IProject? project = null;
+            ITeam? team = null;
+
+            var boards = Enumerable.Empty<IBaseBoard>();
+            IBoard? board = null;
+
+            // Act
+            project = await GetProject();
+            if (project != null)
+            {
+                team = await GetProjectTeam(project);
+                if (team != null)
+                {
+                    boards = await _prjClient.GetProjectTeamBoardsAsync(project, team);
+
+                    if (boards.Any())
+                    {
+                        var baseBoard = boards.First();
+                        board = await _prjClient.GetProjectTeamBoardAsync(project, team, baseBoard.Id);
+                    }
+                }
+            }
+
+            // Assert
+            Assert.NotNull(project);
+            Assert.NotNull(team);
+
+            Assert.True(boards!.Any());
+
+            Assert.NotNull(board);
+            Assert.NotNull(board!.Name);
+            Assert.True(board!.Columns.Any());
+            Assert.True(board!.Rows.Any());
         }
     }
 }
