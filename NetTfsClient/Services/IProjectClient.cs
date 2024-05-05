@@ -1,4 +1,5 @@
-﻿using NetTfsClient.Models.Project;
+﻿using NetTfsClient.Models.Boards;
+using NetTfsClient.Models.Project;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,5 +83,22 @@ namespace NetTfsClient.Services
         /// <param name="identity"><see cref="IIdentity"/> instance (group) </param>
         /// <returns>Enumerable of <see cref="IIdentity"/></returns>
         Task<IEnumerable<IIdentity>> GetProjectGroupMembersAsync(IProject project, IIdentity identity);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="project"></param>
+        /// <param name="team"></param>
+        /// <param name="boardId"></param>
+        /// <returns></returns>
+        Task<IBoard?> GetProjectTeamBoardAsync(IProject project, ITeam team, string boardId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="project"></param>
+        /// <param name="team"></param>
+        /// <returns></returns>
+        Task<IEnumerable<IBoard>> GetProjectTeamBoardsAsync(IProject project, ITeam team);
     }
 }

@@ -186,10 +186,5 @@ namespace NetTfsClient.Services
         {
             return new MentionClient.MentionClient();
         }
-
-        public static IBoardClient GetBoardClient(this IClientConnection clientConnection)
-        {
-            return new BoardClient.BoardClient(clientConnection);
-        }
     }
 }

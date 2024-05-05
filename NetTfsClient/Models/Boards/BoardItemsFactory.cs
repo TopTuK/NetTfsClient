@@ -30,7 +30,7 @@ namespace NetTfsClient.Models.Boards
             }
         }
 
-        public static IEnumerable<IBaseBoard> BoardsFromJsonContent(string jsonContent)
+        internal static IEnumerable<IBaseBoard> BaseBoardsFromJsonContent(string jsonContent)
         {
             var jsonItems = JObject.Parse(jsonContent);
             if (jsonItems["value"] != null)
@@ -91,6 +91,10 @@ namespace NetTfsClient.Models.Boards
                         .Select(k => new BoardStateMap(k, stateItem[k]?.Value<string>() ?? ""))
                         .ToList();
                 }
+                else
+                {
+                    StateMap = Enumerable.Empty<BoardStateMap>();
+                }
             }
         }
 
@@ -131,7 +135,7 @@ namespace NetTfsClient.Models.Boards
             }
         }
 
-        public static IBoard BoardFromJsonContent(string jsonContent)
+        internal static IBoard BoardFromJsonContent(string jsonContent)
         {
             var jsonItem = JObject.Parse(jsonContent);
             return new Board(jsonItem);
