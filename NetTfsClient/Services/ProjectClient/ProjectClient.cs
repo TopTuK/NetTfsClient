@@ -15,6 +15,7 @@ namespace NetTfsClient.Services.ProjectClient
         private const string TEAMS_URL = @"teams";
         private const string PROJECT_TEAM_MEMBERS = @"members";
         private const string BOARDS_URL = @"boards";
+        private const string TEAM_SETTINGS_URL = @"teamsettings";
 
         public ProjectClient(IClientConnection clientConnection)
             : base(clientConnection)
@@ -337,6 +338,32 @@ namespace NetTfsClient.Services.ProjectClient
             catch (Exception ex)
             {
                 throw new ClientException("IProjectClient::GetProjectTeamBoardsAsync: exception raised", ex);
+            }
+        }
+
+        public async Task<ITeamSettings?> GetProjectTeamSettingsAsync(IProject project, ITeam team)
+        {
+            var requestUrl = $"{clientConnection.CollectionName}/{project.Id}/{team.Id}/_apis/work/{TEAM_SETTINGS_URL}";
+
+            var queryParams = new Dictionary<string, string>
+            {
+                { "api-version", API_VERSION },
+            };
+
+            try
+            {
+                var httpResponse = await httpClient.GetAsync(requestUrl, queryParams);
+
+                if ((httpResponse == null) || (httpResponse.HasError) || (httpResponse.Content == null))
+                {
+                    throw new ClientException("IProjectClient::GetProjectTeamBoardsAsync: HTTP response is empty or null");
+                }
+
+                return TeamItemsFactory.TeamSettingsFromJson(httpResponse.Content);
+            }
+            catch (Exception ex)
+            {
+                throw new ClientException("IProjectClient::GetProjectTeamSettingsAsync: exception raised", ex);
             }
         }
     }

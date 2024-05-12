@@ -100,5 +100,13 @@ namespace NetTfsClient.Services
         /// <param name="team"></param>
         /// <returns></returns>
         Task<IEnumerable<IBoard>> GetProjectTeamBoardsAsync(IProject project, ITeam team);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="project"></param>
+        /// <param name="team"></param>
+        /// <returns></returns>
+        Task<ITeamSettings?> GetProjectTeamSettingsAsync(IProject project, ITeam team);
     }
 }

@@ -124,5 +124,37 @@ namespace TfsClient.Tests.ProjectTests
             Assert.True(board!.Columns.Any());
             Assert.True(board!.Rows.Any());
         }
+
+        [Fact(DisplayName = "Get team settings test")]
+        public async Task GetTeamSettingsTests()
+        {
+            // Arrange
+            IProject? project = null;
+            ITeam? team = null;
+
+            ITeamSettings? teamSettings = null;
+
+            // Act
+            project = await GetProject();
+            if (project != null)
+            {
+                team = await GetProjectTeam(project);
+                if (team != null)
+                {
+                    teamSettings = await _prjClient.GetProjectTeamSettingsAsync(project, team);
+                }
+            }
+
+            // Assert
+            Assert.NotNull(project);
+            Assert.NotNull(team);
+
+            Assert.NotNull(teamSettings);
+            Assert.True(teamSettings!.WorkingDays.Any());
+            Assert.False(teamSettings!.BugsBehavior == BugsBehaviorType.UNKNOWN);
+
+            Assert.NotEmpty(teamSettings.BacklogIteration.Id);
+            Assert.NotEmpty(teamSettings.DefaultIteration.Id);
+        }
     }
 }
