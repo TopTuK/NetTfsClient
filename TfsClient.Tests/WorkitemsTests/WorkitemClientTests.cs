@@ -124,20 +124,27 @@ namespace TfsClient.Tests.WorkitemsTests
             var description = $"This BRQ was modified by GitHub action. Last update: {today}";
             var history = $"GitHub action was starter {today}";
 
+            UpdateFieldsResult updateResult = UpdateFieldsResult.UPDATE_FAIL;
+            IWorkitem? wiCopmare = null;
+
             // Act
             var wi = await _workitemClient.GetSingleWorkitemAsync(workitem_id);
 
-            wi.Title = title;
-            wi["System.Description"] = description;
-            wi["System.History"] = history;
+            if (wi != null)
+            {
+                wi.Title = title;
+                wi["System.Description"] = description;
+                wi["System.History"] = history;
 
-            var updateResult = await wi.SaveFieldsChangesAsync();
+                updateResult = await wi.SaveFieldsChangesAsync();
 
-            var wiCopmare = await _workitemClient.GetSingleWorkitemAsync(workitem_id);
+                wiCopmare = await _workitemClient.GetSingleWorkitemAsync(workitem_id);
+            }
 
             // Assert
+            Assert.NotNull(wi);
             Assert.Equal(UpdateFieldsResult.UPDATE_SUCCESS, updateResult);
-            Assert.Equal(title, wi.Title);
+            Assert.Equal(title, wi!.Title);
 
             Assert.NotNull(wiCopmare);
             Assert.Equal(wiCopmare.Id, wi.Id);
@@ -214,10 +221,14 @@ namespace TfsClient.Tests.WorkitemsTests
         {
             // Arrange
             var workitem_id = 6; // [BRQ] Python requirement edited
+            IEnumerable<IWorkitemChange>? changes = null;
 
             // Act
             var wi = await _workitemClient.GetSingleWorkitemAsync(workitem_id);
-            var changes = await wi.GetWorkitemChangesAsync();
+            if (wi != null)
+            {
+                changes = await wi.GetWorkitemChangesAsync();
+            }
 
             // Assert
             Assert.NotNull(changes);

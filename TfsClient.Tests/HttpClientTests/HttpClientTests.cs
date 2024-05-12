@@ -63,8 +63,8 @@ namespace TfsClient.Tests.HttpClientTests
             Assert.NotNull(jsonResponse);
             Assert.NotNull(jsonResponse["args"]);
 
-            Assert.Equal(1, jsonResponse["args"]["id"].Value<int>());
-            Assert.Equal("my_value", jsonResponse["args"]["my_param"].Value<string>());
+            Assert.Equal(1, jsonResponse!["args"]!["id"]!.Value<int>());
+            Assert.Equal("my_value", jsonResponse!["args"]!["my_param"]!.Value<string>());
         }
 
         [Fact(DisplayName = "POST async Returns success response")]
@@ -107,10 +107,10 @@ namespace TfsClient.Tests.HttpClientTests
 
             var jsonResponse = JObject.Parse(response.Content);
             Assert.NotNull(jsonResponse);
-            Assert.NotNull(jsonResponse["form"]);
+            Assert.NotNull(jsonResponse!["form"]);
 
-            Assert.Equal(1, jsonResponse["form"]["id"].Value<int>());
-            Assert.Equal("my_value", jsonResponse["form"]["my_param"].Value<string>());
+            Assert.Equal(1, jsonResponse!["form"]!["id"]!.Value<int>());
+            Assert.Equal("my_value", jsonResponse!["form"]!["my_param"]!.Value<string>());
         }
 
         [Fact(DisplayName = "POST JSON async Returns json response with args")]
@@ -136,9 +136,9 @@ namespace TfsClient.Tests.HttpClientTests
 
             var jsonResponse = JObject.Parse(response.Content);
             Assert.NotNull(jsonResponse);
-            Assert.NotNull(jsonResponse["json"]);
+            Assert.NotNull(jsonResponse!["json"]);
 
-            Assert.Equal(2, jsonResponse["json"].Count());
+            Assert.Equal(2, jsonResponse!["json"]!.Count());
         }
 
         [Fact(DisplayName = "PATCH async Returns success response")]

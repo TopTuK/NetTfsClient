@@ -112,5 +112,59 @@ namespace NetTfsClient.Models.Project
 
             return Enumerable.Empty<ITeamMember>();
         }
+
+        private class AzureIteration : IAzureIteration
+        {
+            public string Id { get; init; }
+            public string Name { get; init; }
+            public string Path { get; init; }
+
+            public AzureIteration(JToken jsonItem)
+            {
+                Id = jsonItem["id"]?.Value<string>() ?? string.Empty;
+                Name = jsonItem["name"]?.Value<string>() ?? string.Empty;
+                Path = jsonItem["path"]?.Value<string>() ?? string.Empty;
+            }
+        }
+
+        private class TeamSettings : ITeamSettings
+        {
+            public BugsBehaviorType BugsBehavior { get; init; }
+            public IEnumerable<string> WorkingDays { get; init; }
+            public string? DefaultIterationMacro { get; init; }
+
+            public IAzureIteration BacklogIteration { get; init; }
+            public IAzureIteration DefaultIteration { get; init; }
+
+        public TeamSettings(JObject jsonItem)
+            {
+                DefaultIterationMacro = jsonItem["defaultIterationMacro"]?.Value<string>();
+
+                BugsBehavior = jsonItem["bugsBehavior"]?.Value<string>() switch
+                {
+                    "off" => BugsBehaviorType.Off,
+                    "asTasks" => BugsBehaviorType.AsTasks,
+                    "asRequirements" => BugsBehaviorType.AsRequirements,
+                    _ => BugsBehaviorType.UNKNOWN
+                };
+
+                WorkingDays = jsonItem["workingDays"]
+                    ?.Values<string>()
+                        .Where(d => d != null)
+                        .Select(d => d!)
+                        .ToList()
+                    ?? Enumerable.Empty<string>();
+
+                BacklogIteration = new AzureIteration(jsonItem["backlogIteration"]!);
+                DefaultIteration = new AzureIteration(jsonItem["defaultIteration"]!);
+            }
+        }
+
+        public static ITeamSettings TeamSettingsFromJson(string jsonContent)
+        {
+            var jsonItem = JObject.Parse(jsonContent);
+
+            return new TeamSettings(jsonItem);
+        }
     }
 }
