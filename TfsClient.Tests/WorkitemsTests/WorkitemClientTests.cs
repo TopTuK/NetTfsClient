@@ -76,6 +76,31 @@ namespace TfsClient.Tests.WorkitemsTests
             Assert.Equal(wi_title, wi.Title);
         }
 
+        [Fact(DisplayName = "Create new workitem in another project. Type: User Story")]
+        public async Task CreateWorkitemAnotherProjectTestSuccess()
+        {
+            // Arrange
+            var today = DateTime.Today;
+            var wi_type_name = "User story";
+            var wi_title = $"[BRQ] Created test user story - {today}";
+            var wi_description = $"This User story was created by .netTfsClient at {today}";
+
+            var wi_project_name = "AnotherProject";
+
+            var wi_fields = new Dictionary<string, string>()
+            {
+                { "System.Title", wi_title },
+                { "System.Description", wi_description },
+            };
+
+            // Act
+            var wi = await _workitemClient.CreateWorkitemAsync(itemType: wi_type_name, itemFields: wi_fields, projectName: wi_project_name);
+
+            // Assert
+            Assert.NotNull(wi);
+            Assert.Equal(wi_title, wi.Title);
+        }
+
         [Fact(DisplayName = "Create child tasks for existing workitem")]
         public async Task CreateChildTasksTestSuccess()
         {

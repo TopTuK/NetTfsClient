@@ -58,6 +58,7 @@ namespace NetTfsClient.Services
         Task<IWorkitem> CreateWorkitemAsync(string itemType,
             IReadOnlyDictionary<string, string>? itemFields = null, 
             IEnumerable<IWorkitemRelation>? itemRelations = null,
+            string? projectName = null,
             string expand = "All", bool bypassRules = false,
             bool suppressNotifications = false, bool validateOnly = false);
 

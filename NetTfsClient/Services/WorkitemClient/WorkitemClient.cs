@@ -173,10 +173,13 @@ namespace NetTfsClient.Services.WorkitemClient
         public async Task<IWorkitem> CreateWorkitemAsync(string itemType,
             IReadOnlyDictionary<string, string>? itemFields = null,
             IEnumerable<IWorkitemRelation>? itemRelations = null,
+            string? projectName = null,
             string expand = "All", bool bypassRules = false,
             bool suppressNotifications = false, bool validateOnly = false)
         {
-            var requestUrl = $"{clientConnection.ProjectApiUrl}{WORKITEM_URL}/${itemType}";
+            var requestUrl = (projectName == null)
+                ? $"{clientConnection.ProjectApiUrl}{WORKITEM_URL}/${itemType}"
+                : $"{clientConnection.CollectionName}/{projectName}/_apis/{WORKITEM_URL}/${itemType}";
 
             var queryParams = MakeQueryParams(expand, bypassRules, suppressNotifications, validateOnly);
 
