@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetTfsClient.Services.HttpClient
@@ -30,7 +31,7 @@ namespace NetTfsClient.Services.HttpClient
                     );
             }
 
-            public ValueTask Authenticate(IRestClient client, RestRequest request)
+            public ValueTask Authenticate(IRestClient client, RestRequest request, CancellationToken cancellationToken)
             {
                 request.AddHeader("Authorization", _personalAccessToken);
                 return ValueTask.CompletedTask;
