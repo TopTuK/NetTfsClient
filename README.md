@@ -1,217 +1,115 @@
-# TESTS
+# NetTfsClient
+
 [![Run tests](https://github.com/TopTuK/NetTfsClient/actions/workflows/tests.yaml/badge.svg)](https://github.com/TopTuK/NetTfsClient/actions/workflows/tests.yaml)
 
-# NetTfsClient
-Microsoft Team Foundation Server .Net Library is a client for Azure service. It can manage workitems, projects and team members.
+A .NET client library for the **Azure DevOps** and **Team Foundation Server (TFS)** REST APIs. It focuses on work items, projects, teams, and related areas you typically need in automation and tools.
 
-## Installing
-TBD
+- **API surface:** [Azure DevOps REST API 6.0](https://learn.microsoft.com/en-us/rest/api/azure/devops/) (with a few non-public endpoints where noted in XML docs).
+- **Stack:** [RestSharp](https://restsharp.dev/) and [Newtonsoft.Json](https://www.newtonsoft.com/json) under the hood.
 
-## Basic usage
-0. Install nettfsclient package
-1. Create client connection with ClientFactory
+## Features
 
-- Authorize with PAT
-```cs
-var serverUrl = "https://tfs.server.my";
-var projetName = "DefaultCollection/Myroject";
-var userPat = "mypersonalaccounttoken";
+- **Connection & auth** — Personal Access Token (PAT), NTLM (username/password), default Windows credentials, `ClaimsPrincipal`, or a custom `IHttpClient`.
+- **Projects & org** — `IProjectClient`: projects, teams, team members, identities/groups (see interface for full list).
+- **Work items** — `IWorkitemClient`: get/update/create/copy, relations, history, WIQL and saved queries, changesets.
+- **Mentions** — `IMentionClient` to add @mentions via history (uses a non-public API; see remarks on `SendMentionAsync`).
 
-// authorize with personal account token
-var connection = ClientFactory.CreateClientConnection(serverUrl, projetName, userPat);
+## Requirements
+
+- A .NET SDK compatible with the target framework in [`NetTfsClient/NetTfsClient.csproj`](NetTfsClient/NetTfsClient.csproj) (currently `net10.0`).
+
+## Installation
+
+Add the [NuGet package](https://www.nuget.org/packages/NetTfsClient) to your project:
+
+```bash
+dotnet add package NetTfsClient
 ```
 
-- Authorize with NTLM
-```cs
-var serverUrl = "https://tfs.server.my";
-var projetName = "DefaultCollection/Myroject";
-var userName = "User";
-var userPassword = "password";
+Or via Visual Studio: *Manage NuGet Packages* → search for `NetTfsClient`.
 
-// authorize with personal account token
-var connection = ClientFactory.CreateClientConnection(userName, userPassword, serverUrl, projectName);
-```
+## Concepts
 
-2. Manage projects, teams and team members
+### Server URL
 
-```cs
-/* Get IProjectClient with extension method GetProjectClient() on connection */
+Pass the base URL of your organization or TFS instance, for example:
+
+- Azure DevOps Services: `https://dev.azure.com/your-organization/`
+- On-premises TFS / Azure DevOps Server: `https://your-server/tfs/`
+
+A trailing `/` is optional; the client normalizes it.
+
+### Project name: `Collection/Project`
+
+The `projectName` argument identifies the **team project** and, when applicable, the **project collection**. Use the form `CollectionName/ProjectName` (e.g. `DefaultCollection/MyProduct`). If you only need collection-level APIs, you can use a collection-only value such as `DefaultCollection` (see `IClientConnection` for how this splits into `CollectionName` and `ProjectName`).
+
+## Authentication
+
+All flows go through `ClientFactory.CreateClientConnection` and return `IClientConnection`, which exposes `ServerUrl`, `CollectionName`, `ProjectName`, and the underlying `IHttpClient`.
+
+| Method | Usage |
+|--------|--------|
+| PAT | `CreateClientConnection(serverUrl, projectName, personalAccessToken)` |
+| NTLM | `CreateClientConnection(userName, userPassword, serverUrl, projectName)` — `projectName` defaults to `DefaultCollection` if omitted |
+| Default credentials (current user) | `CreateClientConnection(serverUrl, projectName)` |
+| Claims | `CreateClientConnection(serverUrl, projectName, claimsPrincipal)` |
+| Custom | `CreateClientConnection(httpClient, projectName)` — `httpClient` must have `BaseUrl` set |
+
+Extension methods on `IClientConnection` (in `NetTfsClient.Services`):
+
+- `GetWorkitemClient()` → `IWorkitemClient`
+- `GetProjectClient()` → `IProjectClient`
+- `GetMentionClient()` → `IMentionClient`
+
+## Quick start
+
+```csharp
+using NetTfsClient.Services;
+
+var serverUrl = "https://dev.azure.com/contoso";
+var projectName = "DefaultCollection/MyProject";
+var pat = /* Personal Access Token with required scopes */;
+
+var connection = ClientFactory.CreateClientConnection(serverUrl, projectName, pat);
+
+// Projects and teams
 var projectClient = connection.GetProjectClient();
-
-Console.WriteLine("### SECTION PROJECTS ###");
-
-// Get projects with GetProjectsAsync()
 var projects = await projectClient.GetProjectsAsync();
 
-foreach (var project in projects)
-{
-    Console.WriteLine($"Project: {project.Id} {project.Name}");
-}
-Console.WriteLine();
-
-// Get all teams with GetAllTeamsAsync()
-var teams = await projectClient.GetAllTeamsAsync();
-
-Console.WriteLine("TFS Teams:");
-foreach (var team in teams)
-{
-    Console.WriteLine($"Team: {team.Id} {team.Name}");
-}
-Console.WriteLine();
-
-// Project teams
-if (projects.Any())
-{
-    var project = projects.First();
-
-    // Get project teams with GetProjectTeamsAsync(project)
-    var projectTeams = await projectClient.GetProjectTeamsAsync(project);
-
-    if (projectTeams.Any())
-    {
-        Console.WriteLine($"Teams of project {project.Name}");
-        foreach (var projectTeam in projectTeams)
-        {
-            Console.WriteLine($"Team: {projectTeam.Id} {projectTeam.Name}");
-        }
-        Console.WriteLine();
-
-        var team = projectTeams.First();
-        
-        // Get team members with GetProjectTeamMembersAsync(project, team)
-        var members = await projectClient.GetProjectTeamMembersAsync(project, team);
-
-        if (members.Any())
-        {
-            Console.WriteLine($"Members of team {team.Name} of project {project.Name}");
-            foreach(var member in members)
-            {
-                Console.WriteLine($"Member: {member.Id} {member.UniqueName} {member.DisplayName}");
-            }
-
-            Console.WriteLine();
-        }
-        else
-        {
-            Console.WriteLine($"You don't have any members of team {team.Name} of project {project.Name}");
-        }
-    }
-    else
-    {
-        Console.WriteLine($"You don't have any teams for project {project.Name} :(");
-        Console.WriteLine();
-    }
-}
-else
-{
-    Console.WriteLine("You don't have any projects :(");
-}
-```
-
-3. Manage workitems
-
-```cs
-* Get IWorkitemClient with extension method GetProjectClient() on connection */
+// Work items
 var workitemClient = connection.GetWorkitemClient();
+var workItem = await workitemClient.GetSingleWorkitemAsync(42);
 
-var workitemId = 1;
-// Get single workitem and properties with GetSingleWorkitemAsync()
-var workitem = await workitemClient.GetSingleWorkitemAsync(workitemId);
-if (workitem != null)
+if (workItem != null)
 {
-    Console.WriteLine($"--- {workitem.Id} {workitem.Title} {workitem.TypeName} ---");
-    Console.WriteLine($"WI propery (System.Title): {workitem["System.Title"]}");
-    Console.WriteLine($"Description: {workitem.Description} Revision: {workitem.Rev}");
-
-    if (workitem.Relations.Any())
-    {
-        Console.WriteLine("Workitem relations:");
-        foreach (var rel in workitem.Relations)
-        {
-            Console.WriteLine($"Relation: workitem {rel.WorkitemId} -> {rel.TypeName} ({rel.RelationType})");
-        }
-    }
-    else
-    {
-        Console.WriteLine($"Workitem {workitem.Id} {workitem.Title} doen't have relation");
-    }
-}
-else
-{
-    Console.WriteLine($"Can't get workitem with ID={workitemId}");
-}
-Console.WriteLine();
-
-if (workitem != null)
-{
-    Console.WriteLine("Get workitem changes with GetWorkitemChangesAsync() on IWorkitem");
-
-    var changes = await workitem.GetWorkitemChangesAsync();
-    if (changes != null)
-    {
-        Console.WriteLine($"Workitem {workitem.Id} {workitem.Title} has {changes.Count()} changes");
-        foreach (var change in changes)
-        {
-            Console.WriteLine($"Change {change.Id}: Rev: {change.Revision} Date: {change.RevisedDate} by {change.RevisedBy.DisplayName}");
-            if (change.FieldsChanges.Any())
-            {
-                Console.WriteLine("Fields changes:");
-                foreach (var fldChange in change.FieldsChanges)
-                {
-                    Console.WriteLine($"Field {fldChange.FieldName} change: Old value: {fldChange.OldValue} New value: {fldChange.NewValue}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Change doesn't have any fields changes");
-            }
-
-            if (change.RelationsChanges.HasChanges)
-            {
-                var addedCount = change.RelationsChanges.Added.Count;
-                var updatedCount = change.RelationsChanges.Updated.Count;
-                var removedCount = change.RelationsChanges.Removed.Count;
-
-                Console.WriteLine($"Relation changes: Added={addedCount} Updated={updatedCount} Removed={removedCount}");
-            }
-            else
-            {
-                Console.WriteLine("Change doesn't have any relation changes");
-            }
-        }
-    }
-    else
-    {
-        Console.WriteLine($"Can't get history changes of workitem {workitem.Id} {workitem.Title}");
-    }
+    Console.WriteLine(workItem["System.Title"]);
+    workItem.Title = "Updated title";
+    await workItem.SaveFieldsChangesAsync();
 }
 ```
 
-```cs
-workitemId = 100;
+For a full runnable sample (including **User Secrets** for URL, project, and PAT), see [`TfsClient.App/Program.cs`](TfsClient.App/Program.cs).
 
-var wi = await workitemClient.GetSingleWorkitemAsync(workitemId);
-if (wi != null)
-{
-    // Set title and description
-    wi.Title = "New Title";
-    wi.Description = "Some description";
+## Building and testing
 
-    // Custom field (eg. System.History)
-    wi["System.History"] = "Hello there!";
+From the repository root:
 
-    // Save changes
-    var updateResult = await wi.SaveFieldsChangesAsync();
-    if (updateResult == UpdateFieldsResult.UPDATE_SUCCESS)
-    {
-        Console.WriteLine($"Update success: {wi.Id} {wi.Title} {wi.Description}");
-    }
-}
-else
-{
-    Console.WriteLine($"Can't get item with id={workitemId}");
-}
+```bash
+dotnet restore
+dotnet build --configuration Release
+dotnet test
 ```
 
-# Coding style
-Google codestyle: https://google.github.io/styleguide/csharp-style.html
+Integration tests may require Azure DevOps/TFS environment variables (see the test project and [`.github/workflows/tests.yaml`](.github/workflows/tests.yaml) for `ENV_SERVER_URL`, `ENV_PROJECT_NAME`, and `ENV_PAT`).
+
+## Documentation in code
+
+Public contracts are documented with XML comments on `ClientFactory`, `IClientConnection`, `IWorkitemClient`, `IProjectClient`, and related types. For REST endpoint references, many `IProjectClient` members link to the official Microsoft REST docs.
+
+## Coding style
+
+This repository follows the [Google C# Style Guide](https://google.github.io/styleguide/csharp-style.html).
+
+## License
+
+See [LICENSE.txt](LICENSE.txt).

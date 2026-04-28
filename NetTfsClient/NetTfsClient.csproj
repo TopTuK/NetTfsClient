@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -14,7 +14,7 @@
     <RepositoryType>https://github.com/TopTuK/NetTfsClient</RepositoryType>
     <PackageTags>Azure;TFS;Azure client;TFS Client;</PackageTags>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <Version>1.2.0</Version>
+    <Version>1.3.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,8 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RestSharp" Version="112.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="RestSharp" Version="114.0.0" />
   </ItemGroup>
 
 </Project>

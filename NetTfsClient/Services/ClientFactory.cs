@@ -105,6 +105,20 @@ namespace NetTfsClient.Services
         }
 
         /// <summary>
+        /// Creates IClientConnection instance with authorization with default credentials (for current user)
+        /// </summary>
+        /// <param name="serverUrl">URL of TFS/Azure service</param>
+        /// <param name="projectName">Project name with collection. Default is 'DefaultCollection' without project</param>
+        /// <returns>Instance of IClientConnection with authorization with PAT for connection to TFS/Azure</returns>
+        public static IClientConnection CreateClientConnection(string serverUrl, string projectName)
+        {
+            serverUrl = TranslateServerUrl(serverUrl);
+            var httpClient = HttpClientFactory.CreateHttpClient(serverUrl, true);
+
+            return new ClientConnection(httpClient, serverUrl, projectName);
+        }
+
+        /// <summary>
         /// Creates IClientConnection instance with authorization with given claims principal
         /// </summary>
         /// <param name="serverUrl">URL of TFS/Azure service</param>
