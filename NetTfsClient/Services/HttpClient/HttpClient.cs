@@ -18,18 +18,13 @@ namespace NetTfsClient.Services.HttpClient
         /// RestSharp IAuthenticator realisation for authenticate with personal access token
         /// Docs: https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=preview-page
         /// </summary>
-        private class TfsPatAuthenticator : IAuthenticator
+        private class TfsPatAuthenticator(string personalAccessToken) : IAuthenticator
         {
-            private readonly string _personalAccessToken;
-
-            public TfsPatAuthenticator(string personalAccessToken)
-            {
-                _personalAccessToken = Encoding.UTF8.
+            private readonly string _personalAccessToken = Encoding.UTF8.
                     GetString(Encoding.Default.GetBytes("Basic ")) +
                     Convert.ToBase64String(
                         Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", personalAccessToken))
                     );
-            }
 
             public ValueTask Authenticate(IRestClient client, RestRequest request, CancellationToken cancellationToken)
             {
@@ -41,14 +36,10 @@ namespace NetTfsClient.Services.HttpClient
         /// <summary>
         /// Basic IHttpResponse realization
         /// </summary>
-        private class RestHttpResponse : IHttpResponse
+        private class RestHttpResponse(RestResponse restResponse) : IHttpResponse
         {
-            private RestResponse _restResponse;
+            private RestResponse _restResponse = restResponse;
 
-            public RestHttpResponse(RestResponse restResponse)
-            {
-                _restResponse = restResponse;
-            }
             public int StatusCode => (int) _restResponse.StatusCode;
             public bool IsSuccess => _restResponse.IsSuccessful;
             public bool HasError => !IsSuccess;
