@@ -17,11 +17,11 @@ namespace NetTfsClient.Services
         /// <summary>
         /// API Version for requests to TFS/Azure service.
         /// </summary>
-        protected const string API_VERSION = "6.0";
+        protected const string API_VERSION = "7.1";
         /// <summary>
         /// Preview API Version for requests to TFS/Azure service.
         /// </summary>
-        protected const string API_PREVIEW_VERSION = "6.0-preview.3";
+        protected const string API_PREVIEW_VERSION = "7.1-preview.3";
 
         /// <summary>
         /// Instance of IClientConnection with information of connection to TFS/Azure service
