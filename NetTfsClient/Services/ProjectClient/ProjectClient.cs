@@ -179,7 +179,7 @@ namespace NetTfsClient.Services.ProjectClient
             }
         }
 
-        // GET {apiUrl}/{organization}/_apis/projects/{projectId}/teams/{teamId}/members?api-version=6.0
+        // GET {apiUrl}/{organization}/_apis/projects/{projectId}/teams/{teamId}/members?api-version=7.1
         public async Task<IEnumerable<ITeamMember>> GetProjectTeamMembersAsync(IProject project, ITeam team)
         {
             var requestUrl = $"{clientConnection.ApiUrl}" +

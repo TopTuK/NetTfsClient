@@ -1,6 +1,7 @@
 name: Run tests
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - master
@@ -22,7 +23,7 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           # Semantic version range syntax or exact version of a dotnet version
-          dotnet-version: '6.0.x'
+          dotnet-version: '10.0.x'
       - name: Install dependencies
         run: dotnet restore
       - name: Build
